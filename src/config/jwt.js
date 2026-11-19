@@ -1,0 +1,2 @@
+// jwt.js
+module.exports = {};
