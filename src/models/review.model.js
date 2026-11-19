@@ -1,42 +1,10 @@
-const db = require('../configs/db');
+const db = require('../config/database');
 
-const findAll = async (filters = {}) => {
-    const [rows] = await db.execute('SELECT * FROM review.s ORDER BY created_at DESC');
-    return rows;
-};
+class ReviewModel {
+    async findByProduct(productId) {
+        const [rows] = await db.query('SELECT * FROM reviews WHERE product_id = ?', [productId]);
+        return rows;
+    }
+}
 
-const findById = async (id) => {
-    const [rows] = await db.execute('SELECT * FROM review.s WHERE id = ?', [id]);
-    return rows[0] || null;
-};
-
-const create = async (payload) => {
-    const keys = Object.keys(payload);
-    const values = Object.values(payload);
-    const placeholders = keys.map(() => '?').join(', ');
-    const sql = `INSERT INTO review.s (${keys.join(', ')}) VALUES (${placeholders})`;
-    await db.execute(sql, values);
-    return payload;
-};
-
-const update = async (id, payload) => {
-    const keys = Object.keys(payload);
-    const values = Object.values(payload);
-    const setClause = keys.map((key) => `${key} = ?`).join(', ');
-    const sql = `UPDATE review.s SET ${setClause} WHERE id = ?`;
-    await db.execute(sql, [...values, id]);
-    return { id, ...payload };
-};
-
-const deleteRecord = async (id) => {
-    const [result] = await db.execute('DELETE FROM review.s WHERE id = ?', [id]);
-    return result.affectedRows > 0;
-};
-
-module.exports = {
-    findAll,
-    findById,
-    create,
-    update,
-    delete: deleteRecord,
-};
+module.exports = new ReviewModel();
